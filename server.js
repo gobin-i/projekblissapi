@@ -11,7 +11,7 @@ var morgan     = require('morgan');
 var mongoose    = require('mongoose');
 var jwt        = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config     = require('./config');
-var UserVoted       = require('./app/models/UserVoted');
+var UserVoted       = require('./app/models/userVoted');
 var Users       = require('./app/models/Users');
 
 var port = process.env.PORT || 8080;        // set our port
@@ -23,6 +23,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 //log
 app.use(morgan('dev'));
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+    next();
+});
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -42,51 +48,49 @@ router.get('/', function(req, res) {
 
 // more routes for our API will happen here
 // ----------------------------------------------------
-router.route('/UserVoted')
 
-    // create a bear (accessed at POST http://localhost:8080/api/bears)
-    .post(function(req, res) {
-        
-        var uservoted = new UserVoted();      // create a new instance of the Bear model
-        uservoted.fbtoken = req.body.fbtoken;  // set the bears name (comes from the request)
+// authenticate and if fbid dont exist, insert into uservoted and passback token
+router.route('/authenticate')
+.post(function(req, res) {
+    UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
 
-        // save the bear and check for errors
-        uservoted.save(function(err) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'uservoted created!' });
-        });
-        
-    })
-    // get all the bears (accessed at GET http://localhost:8080/api/uservoted)
-    .get(function(req, res) {
-        UserVoted.find(function(err, bears) {
-            if (err)
-                res.send(err);
-
-            res.json(bears);
-        });
+        if (err) {
+            res.json({
+                type: false,
+                data: "Error occured: " + err
+            });
+        } else {
+            if (user) {
+               res.json({
+                    type: false,
+                    data: "You already voted"
+                    //type: true,
+                    //data: user,
+                    //token: user.token
+                }); 
+            } else {
+                //dont exist so we put inside uservoted data and pass token
+                console.log(req.body.fbid);
+                var userModel = new UserVoted();
+                userModel.fbid = req.body.fbid;
+                userModel.save(function(err, user) {
+                    user.token = jwt.sign(user, config.secret);
+                    user.save(function(err, user1) {
+                        res.json({
+                            type: true,
+                            data: user1,
+                            token: user1.token
+                        });
+                    });
+                })
+                    
+            }
+        }
     });
+});
 
-router.route('/Users')
-    
-    .post(function(req, res) {
-        
-        var users = new Users();      // create a new instance of the Bear model
-        users.name = req.body.name;  // set the bears name (comes from the request)
-        users.ic = req.body.ic;
-        users.name = req.body.name;
 
-        // save the bear and check for errors
-        uservoted.save(function(err) {
-            if (err)
-                res.send(err);
 
-            res.json({ message: 'uservoted created!' });
-        });
-        
-    })
 
 
 // REGISTER OUR ROUTES -------------------------------
