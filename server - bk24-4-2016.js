@@ -14,8 +14,6 @@ var config     = require('./config');
 var UserVoted       = require('./app/models/userVoted');
 var Users       = require('./app/models/Users');
 var Finalist       = require('./app/models/finalist');
-var facebook = require('./app/models/facebook');
-var request = require('request');
 
 var port = process.env.PORT || 8080;        // set our port
 mongoose.connect(config.database);
@@ -55,50 +53,43 @@ router.get('/', function(req, res) {
 // authenticate and if fbid dont exist, insert into uservoted and passback token
 router.route('/authenticate')
 .post(function(req, res) {
-    var accessToken = '1124095634309355';
-    // check access fb token, if valid save fb user id to mongo and pass back jwt token
-    request('https://graph.facebook.com/'+req.body.fbid+'?access_token=' + accessToken + '|7fa9b6c3521add6e4d3b910e716db51c', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            console.log(body) // Show the HTML for the Google homepage. 
-            UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
+    UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
 
-            if (err) {
-                    res.json({
+        if (err) {
+            res.json({
+                type: false,
+                data: "Error occured: " + err
+            });
+        } else {
+            if (user) {
+               res.json({
                     type: false,
-                    data: "Error occured: " + err
-                });
+                    data: "You already voted"
+                    //type: true,
+                    //data: user,
+                    //token: user.token
+                }); 
             } else {
-                if (user) {
-                    res.json({
-                        type: false,
-                        data: "You already voted"
-                    }); 
-                } else {
-                    //dont exist so we put inside uservoted data and pass token
-                    console.log(req.body.fbid);
-                    var userModel = new UserVoted();
-                    userModel.fbid = req.body.fbid;
-                    userModel.save(function(err, user) {
-                        user.token = jwt.sign(user, config.secret, {
-                            expiresIn: '20m'
+                //dont exist so we put inside uservoted data and pass token
+                console.log(req.body.fbid);
+                var userModel = new UserVoted();
+                userModel.fbid = req.body.fbid;
+                userModel.save(function(err, user) {
+                    user.token = jwt.sign(user, config.secret, {
+                        expiresIn: '30m'
+                    });
+                    user.save(function(err, user1) {
+                        res.json({
+                            type: true,
+                            data: user1,
+                            token: user1.token
                         });
-                        user.save(function(err, user1) {
-                            res.json({
-                                type: true,
-                                data: user1,
-                                token: user1.token
-                            });
-                        });
-                    })
+                    });
+                })
                     
-                }
             }
-            }); //.UserVoted
-        }else{
-            console.log(response.statusCode);
         }
-    })
-    
+    });
 });
 
 // finalist route
@@ -160,19 +151,8 @@ function ensureAuthorized(req, res, next) {
     if (typeof bearerHeader !== 'undefined') {
         var bearer = bearerHeader.split(" ");
         bearerToken = bearer[1];
-        jwt.verify(bearerToken, config.secret, function(err, decoded) {
-            if (err) {
-                res.json({
-                    type: false,
-                    data: "Token expired"
-                });
-
-            }else{
-               req.token = bearerToken;
-               next(); 
-            }
-        });
-        
+        req.token = bearerToken;
+        next();
     } else {
         res.send(403);
     }
