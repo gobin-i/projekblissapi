@@ -57,9 +57,10 @@ router.route('/authenticate')
 .post(function(req, res) {
     var accessToken = '1124095634309355';
     // check access fb token, if valid save fb user id to mongo and pass back jwt token
-    request('https://graph.facebook.com/'+req.body.fbid+'?access_token=' + accessToken + '|7fa9b6c3521add6e4d3b910e716db51c', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            console.log(body)  
+    https.get("https://graph.facebook.com/"+req.body.fbid+"?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(error, response)
+        {
+            if (!error && response.statusCode == 200) {
+            //console.log(body)  
             UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
 
             if (err) {
@@ -94,7 +95,9 @@ router.route('/authenticate')
         }else{
             console.log(response.statusCode);
         }
-    })
+        } //.https get
+    )
+    
     
 });
 
