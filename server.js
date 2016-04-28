@@ -103,50 +103,7 @@ router.route('/authenticate')
         }
         }
     )
-    // check access fb token, if valid save fb user id to mongo and pass back jwt token
-    /*
-    https.get("https://graph.facebook.com/"+req.body.fbid+"?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(error, response)
-        {
-            console.log(response.statusCode);
-            if (!error && response.statusCode == 200) {
-            //console.log(body)  
-            UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
-
-            if (err) {
-                    res.json({
-                    type: false,
-                    data: "Error occured: " + err
-                });
-            } else {
-                if (user) {
-                    res.json({
-                        type: false,
-                        data: "You already voted"
-                    }); 
-                } else {
-                    //dont exist so we put inside uservoted data and pass token
-                    console.log(req.body.fbid);
-                    
-                        token = jwt.sign(user, config.secret, {
-                            expiresIn: '20m'
-                        });
-                        console.log(token);
-                            res.json({
-                                type: true,
-                                data: 'authentication process done',
-                                token: token
-                            });
-                        
-                    
-                }
-            }
-            }); //.UserVoted
-        }else{
-            console.log(response.statusCode);
-        }
-        } //.https get
-    )
-*/
+    
     
     
 });
@@ -177,6 +134,16 @@ router.route('/finalist')
         });
     });
 
+// GET single finalist
+router.route('/finalist/:finalist_id')
+
+    .get(function(req, res) {
+        Finalist.findById(req.params.finalist_id, function(err, finalist) {
+            if (err)
+                res.send(err);
+            res.json(finalist);
+        });
+    });
 // Increment finalist vote by finalist id
 router.route('/vote')
     .put(ensureAuthorized,function(req, res) {
