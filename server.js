@@ -57,9 +57,9 @@ router.get('/', function(req, res) {
 router.route('/authenticate')
 .post(function(req, res) {
     var accessToken = '1124095634309355';
-    https.get("https://graph.facebook.com/10209494614226308?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(res)
+    https.get("https://graph.facebook.com/10209494614226308?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(response)
         {
-            if (res.statusCode == 200) {
+            if (response.statusCode == 200) {
             //console.log(body)  
             UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
 
@@ -93,7 +93,7 @@ router.route('/authenticate')
             }
             }); //.UserVoted
         }else{
-            console.log(res.statusCode);
+            console.log(response.statusCode);
         }
         }
     )
