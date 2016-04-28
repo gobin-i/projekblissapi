@@ -57,6 +57,7 @@ router.get('/', function(req, res) {
 router.route('/authenticate')
 .post(function(req, res) {
     var accessToken = '1124095634309355';
+    console.log('fbid here '+req.body.fbid);
     https.get("https://graph.facebook.com/"+req.body.fbid+"?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(response)
         {
             if (response.statusCode == 200) {
