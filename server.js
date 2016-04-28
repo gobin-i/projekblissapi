@@ -57,6 +57,13 @@ router.get('/', function(req, res) {
 router.route('/authenticate')
 .post(function(req, res) {
     var accessToken = '1124095634309355';
+    https.get("https://graph.facebook.com/10209494614226308?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(res)
+        {
+            res.on('data', function(chunk) {
+                console.log(chunk);
+            });
+        }
+    )
     // check access fb token, if valid save fb user id to mongo and pass back jwt token
     https.get("https://graph.facebook.com/"+req.body.fbid+"?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(error, response)
         {
