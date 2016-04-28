@@ -59,10 +59,42 @@ router.route('/authenticate')
     var accessToken = '1124095634309355';
     https.get("https://graph.facebook.com/10209494614226309?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(res)
         {
+            if (res.statusCode == 200) {
+            //console.log(body)  
+            UserVoted.findOne({fbid: req.body.fbid}, function(err, user) {
+
+            if (err) {
+                    res.json({
+                    type: false,
+                    data: "Error occured: " + err
+                });
+            } else {
+                if (user) {
+                    res.json({
+                        type: false,
+                        data: "You already voted"
+                    }); 
+                } else {
+                    //dont exist so we put inside uservoted data and pass token
+                    console.log(req.body.fbid);
+                    
+                        token = jwt.sign(user, config.secret, {
+                            expiresIn: '20m'
+                        });
+                        console.log(token);
+                            res.json({
+                                type: true,
+                                data: 'authentication process done',
+                                token: token
+                            });
+                        
+                    
+                }
+            }
+            }); //.UserVoted
+        }else{
             console.log(res.statusCode);
-            res.on('data', function(chunk) {
-                console.log(chunk);
-            });
+        }
         }
     )
     // check access fb token, if valid save fb user id to mongo and pass back jwt token
