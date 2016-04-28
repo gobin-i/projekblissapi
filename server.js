@@ -65,6 +65,7 @@ router.route('/authenticate')
         }
     )
     // check access fb token, if valid save fb user id to mongo and pass back jwt token
+    /*
     https.get("https://graph.facebook.com/"+req.body.fbid+"?access_token=1124095634309355|7fa9b6c3521add6e4d3b910e716db51c",function(error, response)
         {
             console.log(response.statusCode);
@@ -106,6 +107,7 @@ router.route('/authenticate')
         }
         } //.https get
     )
+*/
     
     
 });
