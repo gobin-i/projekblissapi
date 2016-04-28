@@ -76,17 +76,20 @@ router.route('/authenticate')
                 } else {
                     //dont exist so we put inside uservoted data and pass token
                     console.log(req.body.fbid);
-                    
-                        token = jwt.sign(user, config.secret, {
+                    var userModel = new UserVoted();
+                    userModel.fbid = req.body.fbid;
+                    userModel.save(function(err, user) {
+                        user.token = jwt.sign(user, config.secret, {
                             expiresIn: '20m'
                         });
-                        console.log(token);
+                        user.save(function(err, user1) {
                             res.json({
                                 type: true,
-                                data: 'authentication process done',
-                                token: token
+                                data: user1,
+                                token: user1.token
                             });
-                        
+                        });
+                    })
                     
                 }
             }
@@ -138,40 +141,28 @@ router.route('/vote')
             });
 
             finalist.vote = (finalist.vote + 1);
-            
+            /*
+            finalist.voters.name = req.body.name;
+            finalist.voters.ic = req.body.ic;
+            finalist.voters.phone = req.body.phone;
+            finalist.voters.email = req.body.email;
+            finalist.voters.slogan = req.body.slogan;
+            console.log(req.body.name);
+            */
             // save vote
             finalist.save(function(err) {
                 if (err)
                     res.json({ type: false, data: "Error occured: " + err });
-                
                 Finalist.findByIdAndUpdate(
                     req.body.fid,
                     {$push: {"voters": {name: req.body.name, ic: req.body.ic, phone: req.body.phone, email:req.body.email, slogan:req.body.slogan, ans1:req.body.ans1, ans2:req.body.ans2}}},
                     {safe: true, upsert: true, new : true},
                     function(err, model) {
-                        if (err)
-                            res.json({
-                            type: false,
-                            data: "Error occured: " + err
-                            });
-
-                        var userModel = new UserVoted();
-                        userModel.fbid = req.body.fbid;
-                        userModel.save(function(err, user) {
-                            res.json({
-                                type: true,
-                                data: 'Vote Updated!',
-                                
-                            });
-                        
-                        })
-
+                    console.log(err);
                     }
                 );
 
-
-
-                //res.json({ type: true, data: 'Vote Updated!' });
+                res.json({ type: true, data: 'Vote Updated!' });
             });
 
         });
