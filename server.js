@@ -95,6 +95,11 @@ router.route('/authenticate')
             }); //.UserVoted
         }else{
             console.log(response.statusCode);
+            res.json({
+                                type: false,
+                                data: 'Bad Request'
+                                
+            });
         }
         }
     )
