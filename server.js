@@ -16,6 +16,7 @@ var Users       = require('./app/models/Users');
 var Finalist       = require('./app/models/finalist');
 var facebook = require('./app/models/facebook');
 var request = require('request');
+var https = require('https');
 
 var port = process.env.PORT || 8080;        // set our port
 mongoose.connect(config.database);
