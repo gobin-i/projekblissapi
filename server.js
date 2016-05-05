@@ -5,6 +5,7 @@
 
 // call the packages we need
 var express    = require('express');        // call express
+var helmet = require('helmet');
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var morgan     = require('morgan');
@@ -17,7 +18,7 @@ var Finalist       = require('./app/models/finalist');
 var facebook = require('./app/models/facebook');
 var request = require('request');
 var https = require('https');
-var helmet = require('helmet')
+
 
 var port = process.env.PORT || 8080;        // set our port
 mongoose.connect(config.database);
