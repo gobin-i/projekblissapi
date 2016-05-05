@@ -17,6 +17,7 @@ var Finalist       = require('./app/models/finalist');
 var facebook = require('./app/models/facebook');
 var request = require('request');
 var https = require('https');
+var helmet = require('helmet')
 
 var port = process.env.PORT || 8080;        // set our port
 mongoose.connect(config.database);
@@ -33,6 +34,9 @@ app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
     next();
 });
+app.use(helmet());
+//disable x-powered-by
+app.disable('x-powered-by');
 
 // ROUTES FOR OUR API
 // =============================================================================
