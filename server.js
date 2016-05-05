@@ -26,6 +26,10 @@ app.set('superSecret', config.secret);
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// http-header prevention
+app.use(helmet());
+
 //log
 app.use(morgan('dev'));
 app.use(function(req, res, next) {
@@ -34,8 +38,7 @@ app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
     next();
 });
-app.use(helmet());
-app.use(helmet.xssFilter({ setOnOldIE: true }));
+
 
 //disable x-powered-by
 app.disable('x-powered-by');
