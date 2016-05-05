@@ -42,7 +42,7 @@ app.use(function(req, res, next) {
 
 
 //disable x-powered-by
-app.disable('x-powered-by');
+app.use(helmet.hidePoweredBy({ setTo: 'PHP 4.2.0' }))
 
 // ROUTES FOR OUR API
 // =============================================================================
