@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 
 // http-header prevention
 app.use(helmet());
-
+app.use(helmet.noCache());
 //log
 app.use(morgan('dev'));
 app.use(function(req, res, next) {
