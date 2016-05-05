@@ -36,7 +36,7 @@ app.use(function(req, res, next) {
 });
 app.use(helmet());
 app.use(helmet.xssFilter({ setOnOldIE: true }));
-app.use(frameguard({ action: 'deny' }));
+
 //disable x-powered-by
 app.disable('x-powered-by');
 
