@@ -14,7 +14,7 @@ var finalistSchema   = new Schema({
     	slogan: String, 
     	ans1: String, 
     	ans2: String, 
-    	subscribe: {type: String, default:'No'}
+    	subscribe: String
     }]
 
 });
