@@ -55,7 +55,7 @@ router.use(function(req, res, next) {
     next(); // make sure we go to the next routes and don't stop here
 });
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
+
 router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });   
 });
@@ -63,7 +63,7 @@ router.get('/', function(req, res) {
 // API Magic happens here guys
 
 // auth route
-// authenticate and if fbid dont exist, insert into uservoted and passback token
+// authenticate and if fbid dont exist, passback token
 router.route('/authenticate')
 .post(function(req, res) {
     var accessToken = '1124095634309355';
@@ -86,7 +86,7 @@ router.route('/authenticate')
                         data: "You already voted"
                     }); 
                 } else {
-                    //dont exist so we put inside uservoted data and pass token
+                    //dont exist so we pass token to client localstorage
                     console.log(req.body.fbid);
                     
                         token = jwt.sign(user, config.secret, {
@@ -154,7 +154,7 @@ router.route('/finalist/:finalist_id')
             res.json(finalist);
         });
     });
-// Increment finalist vote by finalist id
+// Increment finalist vote by finalist id and insert user submission
 router.route('/vote')
     .put(ensureAuthorized,function(req, res) {
 
@@ -167,6 +167,7 @@ router.route('/vote')
                 data: "Error occured: " + err
             });
 
+            //increment finalist vote
             finalist.vote = (finalist.vote + 1);
             
             // save vote
@@ -174,9 +175,10 @@ router.route('/vote')
                 if (err)
                     res.json({ type: false, data: "Error occured: " + err });
                 
+                // update finalist by request id and insert user submission
                 Finalist.findByIdAndUpdate(
                     req.body.fid,
-                    {$push: {"voters": {name: req.body.name, ic: req.body.ic, phone: req.body.phone, email:req.body.email, slogan:req.body.slogan, ans1:req.body.ans1, ans2:req.body.ans2}}},
+                    {$push: {"voters": {name: req.body.name, ic: req.body.ic, phone: req.body.phone, email:req.body.email, slogan:req.body.slogan, ans1:req.body.ans1, ans2:req.body.ans2, subscribe:req.body.subscribe}}},
                     {safe: true, upsert: true, new : true},
                     function(err, model) {
                         if (err)
